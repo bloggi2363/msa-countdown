@@ -242,9 +242,9 @@
 <div class="blob blob-2"></div>
 
 <div class="card">
-  <div class="badge">Schleswig-Holstein · Schuljahr 2025/26</div>
+  <div class="badge">Schleswig-Holstein · Schuljahr 2026/27</div>
   <h1>MSA Mathematik</h1>
-  <p class="subtitle">Zentralprüfung · 05. Mai 2026</p>
+  <p class="subtitle">Zentralprüfung · 11. Mai 2027</p>
 
   <div id="countdown-wrap">
     <div class="countdown">
@@ -273,16 +273,18 @@
       <div class="progress-fill" id="progress" style="width:0%"></div>
     </div>
 
-    <p class="exam-date">Prüfungsbeginn: <strong>Dienstag, 05. Mai 2026 · 08:00 Uhr</strong></p>
+    <p class="exam-date">Prüfungsbeginn: <strong>Dienstag, 11. Mai 2027 · 08:00 Uhr</strong></p>
   </div>
 
   <div class="finished-msg" id="finished">🎉 Prüfung hat begonnen – viel Erfolg!</div>
 </div>
 
 <script>
-  const EXAM = new Date('2026-05-05T08:00:00');
-  // Start of school year approx. 02.09.2025
-  const START = new Date('2025-09-02T00:00:00');
+  // Neues Prüfungsdatum: 11. Mai 2027, 08:00 Uhr
+  const EXAM = new Date('2027-05-11T08:00:00');
+  
+  // Start des Schuljahres 2026/27 (Anfang September 2026) für den Fortschrittsbalken
+  const START = new Date('2026-09-01T00:00:00');
   const totalMs = EXAM - START;
 
   const els = {
@@ -291,52 +293,4 @@
     minutes: document.getElementById('d-minutes'),
     seconds: document.getElementById('d-seconds'),
     progress: document.getElementById('progress'),
-    wrap:    document.getElementById('countdown-wrap'),
-    finished: document.getElementById('finished'),
-  };
-
-  let prev = { days: null, hours: null, minutes: null, seconds: null };
-
-  function pad(n) { return String(n).padStart(2, '0'); }
-
-  function flip(el) {
-    el.classList.remove('flip');
-    void el.offsetWidth;
-    el.classList.add('flip');
-  }
-
-  function tick() {
-    const now = new Date();
-    const diff = EXAM - now;
-
-    if (diff <= 0) {
-      els.wrap.style.display = 'none';
-      els.finished.style.display = 'block';
-      return;
-    }
-
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-
-    const vals = { days: pad(d), hours: pad(h), minutes: pad(m), seconds: pad(s) };
-
-    for (const key of ['days','hours','minutes','seconds']) {
-      if (vals[key] !== prev[key]) {
-        els[key].textContent = vals[key];
-        flip(els[key]);
-        prev[key] = vals[key];
-      }
-    }
-
-    const elapsed = Math.max(0, now - START);
-    const pct = Math.min(100, (elapsed / totalMs) * 100);
-    els.progress.style.width = pct + '%';
-  }
-
-  tick();
-  setInterval(tick, 1000);
-</script>
-</body>
-</html>
+   
