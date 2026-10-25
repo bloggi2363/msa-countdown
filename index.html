@@ -31,7 +31,6 @@
     position: relative;
   }
 
-  /* Animated grid background */
   body::before {
     content: '';
     position: fixed;
@@ -44,7 +43,6 @@
     z-index: 0;
   }
 
-  /* Glow blobs */
   .blob {
     position: fixed;
     border-radius: 50%;
@@ -167,7 +165,6 @@
     animation: flipAnim 0.35s ease;
   }
 
-  /* Seconds get a softer fade-only transition */
   #d-seconds.flip {
     animation: fadeNum 0.8s ease;
   }
@@ -280,17 +277,83 @@
 </div>
 
 <script>
-  // Neues Prüfungsdatum: 11. Mai 2027, 08:00 Uhr
-  const EXAM = new Date('2027-05-11T08:00:00');
-  
-  // Start des Schuljahres 2026/27 (Anfang September 2026) für den Fortschrittsbalken
-  const START = new Date('2026-09-01T00:00:00');
-  const totalMs = EXAM - START;
+  try {
+    // WICHTIG: Zeitzone Europe/Berlin wird explizit gesetzt
+    // Das Format '2027-05-11T08:00:00+02:00' entspricht 08:00 Uhr deutscher Zeit (MESZ)
+    const EXAM = new Date('2027-05-11T08:00:00+02:00');
+    const START = new Date('2026-09-01T00:00:00+02:00');
+    const totalMs = EXAM - START;
 
-  const els = {
-    days:    document.getElementById('d-days'),
-    hours:   document.getElementById('d-hours'),
-    minutes: document.getElementById('d-minutes'),
-    seconds: document.getElementById('d-seconds'),
-    progress: document.getElementById('progress'),
-   
+    console.log('Prüfungsdatum:', EXAM.toString());
+    console.log('Startdatum:', START.toString());
+    console.log('Aktuelle Zeit:', new Date().toString());
+    console.log('Differenz in ms:', EXAM - new Date());
+
+    const els = {
+      days:    document.getElementById('d-days'),
+      hours:   document.getElementById('d-hours'),
+      minutes: document.getElementById('d-minutes'),
+      seconds: document.getElementById('d-seconds'),
+      progress: document.getElementById('progress'),
+      wrap:    document.getElementById('countdown-wrap'),
+      finished: document.getElementById('finished'),
+    };
+
+    // Prüfen, ob alle Elemente gefunden wurden
+    for (const key in els) {
+      if (!els[key]) {
+        console.error('Element nicht gefunden:', key);
+      }
+    }
+
+    let prev = { days: null, hours: null, minutes: null, seconds: null };
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function flip(el) {
+      if (!el) return;
+      el.classList.remove('flip');
+      void el.offsetWidth;
+      el.classList.add('flip');
+    }
+
+    function tick() {
+      const now = new Date();
+      const diff = EXAM - now;
+
+      if (diff <= 0) {
+        els.wrap.style.display = 'none';
+        els.finished.style.display = 'block';
+        return;
+      }
+
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      const vals = { days: pad(d), hours: pad(h), minutes: pad(m), seconds: pad(s) };
+
+      for (const key of ['days','hours','minutes','seconds']) {
+        if (vals[key] !== prev[key] && els[key]) {
+          els[key].textContent = vals[key];
+          flip(els[key]);
+          prev[key] = vals[key];
+        }
+      }
+
+      const elapsed = Math.max(0, now - START);
+      const pct = Math.min(100, (elapsed / totalMs) * 100);
+      if (els.progress) {
+        els.progress.style.width = pct + '%';
+      }
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  } catch (error) {
+    console.error('Fehler im Countdown-Script:', error);
+  }
+</script>
+</body>
+</html>
